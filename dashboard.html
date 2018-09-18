@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+
+	<title>Dashboard</title>
+
+	<style>
+		ul{padding-left: 0px}
+		ul li {list-style: none;}
+	</style>
+</head>
+<body>
+	<div class="container mt-5">
+		<ul class="row"></ul>
+		<button class="btn btn-primary prev" disabled="disabled">Prev</button>
+		<button class="btn btn-primary next">Next</button>
+	</div>		
+</body>
+</html>
+<script>
+	var theRequest = new XMLHttpRequest(),
+		myContainer = document.querySelector('.row'),
+		htmlString = "",
+		api = 'https://reqres.in/api/users?page=',
+		count = 1,
+		next = document.querySelector('.next'),
+		prev = document.querySelector('.prev');
+
+	theRequest.open('GET', api + count);
+	theRequest.onload = function() {
+		var theData = JSON.parse(theRequest.responseText);
+
+		if(theRequest.status === 200) {
+			for(i = 0; i < theData.data.length; i++) {
+				htmlString += "<li class='col-sm-4'><p><b>Name: </b>"+theData.data[i].first_name+" "+theData.data[i].last_name+"</p></li>";
+			}
+			myContainer.innerHTML = htmlString;
+		} else {
+			console.log('deu ruim');
+		}
+	};
+	theRequest.send();
+
+	next.addEventListener("click", function(e){
+		e.preventDefault();
+		htmlString = "";
+
+		count++;
+
+		if(count > 1) {
+			prev.disabled = false;
+		}
+		
+		theRequest.open('GET', api + count);
+		theRequest.onload = function() {
+			var theData = JSON.parse(theRequest.responseText);
+
+			if(count == theData.total_pages) {
+				next.disabled = true;
+			} 
+
+			if(theRequest.status === 200) {
+				for(i = 0; i < theData.data.length; i++) {
+					htmlString += "<li class='col-sm-4'><p><b>Name: </b>"+theData.data[i].first_name+" "+theData.data[i].last_name+"</p></li>";
+				}
+				myContainer.innerHTML = htmlString;
+			} else {
+				console.log('deu ruim');
+			}
+		};
+		theRequest.send();
+	});
+
+	prev.addEventListener("click", function(e){
+		e.preventDefault();
+		htmlString = "";
+
+		count--;
+
+		if(count == 1) {
+			prev.disabled = true;
+			next.disabled = false;
+		} else {
+			next.disabled = false;
+		}
+		
+		theRequest.open('GET', api + count);
+		theRequest.onload = function() {
+			var theData = JSON.parse(theRequest.responseText);
+
+			if(theRequest.status === 200) {
+				for(i = 0; i < theData.data.length; i++) {
+					htmlString += "<li class='col-sm-4'><p><b>Name: </b>"+theData.data[i].first_name+" "+theData.data[i].last_name+"</p></li>";
+				}
+				myContainer.innerHTML = htmlString;
+			} else {
+				console.log('deu ruim');
+			}
+		};
+		theRequest.send();
+	});
+</script>
